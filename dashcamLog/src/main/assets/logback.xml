@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- https://github.com/tony19/logback-android/wiki -->
+<configuration>
+
+    <property name="LOG_DIR" value="/data/data/com.ash.logger/files"/>
+    <property name="LOG_FILE" value="app.log"/>
+
+    <!-- Appender which writes the logs to file.
+        https://logback.qos.ch/manual/appenders.html#RollingFileAppender -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>app.%i.log.gz</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>5</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>1MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <!-- https://logback.qos.ch/manual/layouts.html#ClassicPatternLayout -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%X{pid}] [%thread] %-5level %logger{1} %msg%n</pattern>
+            <immediateFlush>false</immediateFlush>
+        </encoder>
+    </appender>
+
+    <!-- Asynchronous appender, which dispatches the logging events to other appender(s).
+        https://logback.qos.ch/manual/apppenders.html#AsyncAppender -->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- Filter: Do not log TRACE level to the file. -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <appender-ref ref="FILE"/>
+    </appender>
+
+    <!-- This appender writes directly to the logcat. -->
+    <appender name="LOGCAT" class="ch.qos.logback.classic.android.LogcatAppender">
+        <checkLoggable>false</checkLoggable>\
+        <!-- The tagEncoder specifies what is written to the logcat TAG.
+         NOTE: always include the %nopex specifier in tagEncoder! -->
+        <encoder>
+            <pattern>%logger{1}%nopex</pattern>
+        </encoder>
+
+        <!-- And the encoder specifies the message. No need to include the thread or
+         log level information here, logcat does that automatically. -->
+        <encoder>
+            <pattern>%msg</pattern>
+        </encoder>
+    </appender>
+
+    <!-- The root appender. -->
+    <appender-ref ref="LOGCAT"/>
+    <appender-ref ref="ASYNC"/>
+
+
+</configuration>
