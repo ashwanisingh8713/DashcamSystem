@@ -4,9 +4,10 @@
 
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" android:maxSdkVersion="33" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- For Android 13+ use the scoped media permissions for images/videos; keep legacy permissions for older devices -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -45,10 +46,58 @@
             android:theme="@style/Theme.DashcamSystem">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Boot launch helper activity used as a full-screen intent target -->
+        <activity
+            android:name=".BootLaunchActivity"
+            android:exported="true"
+            android:theme="@style/Theme.DashcamSystem" />
+
+        <service
+            android:name="cam.et.dashcamsystem.app.services.BackgroundCameraService"
+            android:exported="false"
+            android:foregroundServiceType="camera|location" />
+
+        <!-- Immortal foreground service -->
+        <service
+            android:name="cam.et.dashcamsystem.app.services.ImmortalService"
+            android:exported="false"
+            android:foregroundServiceType="camera|location" />
+
+        <!-- Receiver used to restart the service after being scheduled by AlarmManager -->
+        <receiver
+            android:name="cam.et.dashcamsystem.app.receivers.RestartReceiver"
+            android:exported="false" />
+
+        <!-- Receiver to handle scheduled activity launches -->
+        <receiver
+            android:name="cam.et.dashcamsystem.app.receivers.ActivityLaunchReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="cam.et.dashcamsystem.ACTION_LAUNCH_MAIN" />
+                <action android:name="android.intent.action.USER_UNLOCKED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Boot receiver to restart service after device reboot -->
+        <receiver
+            android:name="cam.et.dashcamsystem.app.receivers.BootReceiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin_receiver" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

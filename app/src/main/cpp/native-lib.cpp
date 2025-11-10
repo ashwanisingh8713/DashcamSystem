@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <android/log.h>
+#include <cstring>
 
 #define LOG_TAG "bgcam_native"
 #define ALOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -19,7 +20,7 @@ Java_cam_et_bgcamapp_MainActivity_stringFromJNI(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_cam_et_bgcamapp_NativeLib_isImageDark(JNIEnv* env, jclass clazz, jintArray jpixels, jint width, jint height, jint threshold) {
+Java_cam_et_dashcamsystem_nativelib_NativeLib_isImageDark(JNIEnv* env, jobject clazz, jintArray jpixels, jint width, jint height, jint threshold) {
     if (jpixels == nullptr) return JNI_FALSE;
     jint *pixels = env->GetIntArrayElements(jpixels, nullptr);
     if (pixels == nullptr) return JNI_FALSE;
@@ -43,7 +44,7 @@ Java_cam_et_bgcamapp_NativeLib_isImageDark(JNIEnv* env, jclass clazz, jintArray 
 
 // POSIX save bytes
 extern "C" JNIEXPORT jboolean JNICALL
-Java_cam_et_bgcamapp_NativeLib_saveBytesToFile(JNIEnv* env, jclass clazz, jstring jpath, jbyteArray jdata) {
+Java_cam_et_dashcamsystem_nativelib_NativeLib_saveBytesToFile(JNIEnv* env, jobject clazz, jstring jpath, jbyteArray jdata) {
     if (jpath == nullptr || jdata == nullptr) return JNI_FALSE;
     const char* path = env->GetStringUTFChars(jpath, nullptr);
     jsize len = env->GetArrayLength(jdata);
@@ -76,7 +77,7 @@ Java_cam_et_bgcamapp_NativeLib_saveBytesToFile(JNIEnv* env, jclass clazz, jstrin
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_cam_et_bgcamapp_NativeLib_appendLog(JNIEnv* env, jclass clazz, jstring jpath, jstring jline) {
+Java_cam_et_dashcamsystem_nativelib_NativeLib_appendLog(JNIEnv* env, jobject clazz, jstring jpath, jstring jline) {
     if (jpath == nullptr || jline == nullptr) return JNI_FALSE;
     const char* path = env->GetStringUTFChars(jpath, nullptr);
     const char* line = env->GetStringUTFChars(jline, nullptr);

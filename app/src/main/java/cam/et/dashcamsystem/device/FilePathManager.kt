@@ -1,7 +1,9 @@
 package cam.et.dashcamsystem.device
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Environment
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -10,44 +12,84 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Utility to provide and manage app-scoped directories and files for logs, results and images.
+ * Singleton utility to provide and manage app-scoped directories and files for logs, results and images.
  *
- * Responsibilities:
- * - Provide directories (logs/results/images) under app-specific storage (externalFilesDir when available, otherwise internal filesDir).
- * - Create timestamped files and helpers to save text and bitmaps.
- * - Small housekeeping utilities like deleting old files and checking available space.
- *
- * Notes:
- * - Uses app-specific external directories returned by Context.getExternalFilesDir(null) which do not require external storage permission.
- * - SimpleDateFormat is only used on the caller (main) thread for generating names; methods are safe to call from background threads as they do not mutate shared state.
+ * Use FilePathManager.init(applicationContext) once (for example in Application.onCreate()).
+ * After that you can call the helper methods anywhere without creating an instance.
  */
-class FilePathManager(private val context: Context, private val preferExternal: Boolean = true) {
+@SuppressLint("StaticFieldLeak")
+object FilePathManager {
 
-    companion object {
-        private const val DIR_LOGS = "logs"
-        private const val DIR_RESULTS = "results"
-        private const val DIR_IMAGES = "images"
-        @Volatile
-        private var NAME_TS_LOCALE: Locale = Locale.getDefault()
-        // Keep a cached SimpleDateFormat for filename generation; recreate when locale changes.
-        @Volatile
-        private var NAME_TS_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", NAME_TS_LOCALE)
+    private const val DIR_LOGS = "logs"
+    private const val DIR_RESULTS = "results"
+    private const val DIR_IMAGES = "images"
+
+    @Volatile
+    private var NAME_TS_LOCALE: Locale = Locale.getDefault()
+    @Volatile
+    private var NAME_TS_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", NAME_TS_LOCALE)
+    private val tsFormatLock = Any()
+
+    // Application context (set once)
+    private var ctx: Context? = null
+
+    /** Initialize the manager with application context. Call once early (e.g. Application.onCreate()). */
+    fun init(context: Context) {
+        ctx = context.applicationContext
     }
 
-    /**
-     * Base directory for app files. If external files dir is available and preferred, uses it; otherwise falls back to internal filesDir.
-     */
-    // The on-disk storage root we control (external files dir or internal files dir).
+    private fun requireCtx(): Context = ctx ?: throw IllegalStateException("FilePathManager not initialized. Call FilePathManager.init(context) first.")
+
+    // Base directory for app files. Prefer app-specific external files dir; fall back to internal filesDir.
     private fun baseStorageDir(): File {
-        if (preferExternal) {
-            val ext = context.getExternalFilesDir(null)
-            if (ext != null) return ext
-        }
-        return context.filesDir
+        val context = requireCtx()
+        val ext = context.getExternalFilesDir(null)
+        return ext ?: context.filesDir
     }
 
-    // All our folders must live inside this application root directory named "DashcamSystem".
-    private fun appRootDir(): File = ensureDir(File(baseStorageDir(), "DashcamSystem"))
+    // Ensure application root directory named "DashcamSystem".
+    // Try a few common external storage roots (covers many device models). If none are usable,
+    // fall back to the app-specific storage directory.
+    private fun appRootDir(): File {
+        val candidates = buildList {
+            add("/mnt/sdcard")
+            add("/storage/emulated/0")
+            try {
+                if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+                    Environment.getExternalStorageDirectory()?.absolutePath?.let { add(it) }
+                }
+            } catch (_: Exception) {
+            }
+        }
+
+        for (basePath in candidates.distinct()) {
+            val root = File(basePath, "DashcamSystem")
+            if (ensureWritable(root)) return root
+        }
+
+        // Fallback to app-specific storage
+        return ensureDir(File(baseStorageDir(), "DashcamSystem"))
+    }
+
+    // Try to create the directory and verify writability by creating a small probe file.
+    private fun ensureWritable(dir: File): Boolean {
+        try {
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            if (!dir.exists()) return false
+            if (dir.canWrite()) return true
+            // Probe by creating and removing a small file
+            val probe = File(dir, ".probe")
+            return try {
+                probe.createNewFile() && probe.exists().also { probe.delete() }
+            } catch (_: Exception) {
+                false
+            }
+        } catch (_: Exception) {
+            return false
+        }
+    }
 
     private fun ensureDir(dir: File): File {
         if (!dir.exists()) {
@@ -69,14 +111,14 @@ class FilePathManager(private val context: Context, private val preferExternal: 
     fun timestampedName(prefix: String = "file", extension: String? = null): String {
         val localeNow = Locale.getDefault()
         if (localeNow != NAME_TS_LOCALE) {
-            synchronized(this) {
+            synchronized(tsFormatLock) {
                 if (localeNow != NAME_TS_LOCALE) {
                     NAME_TS_LOCALE = localeNow
                     NAME_TS_FORMAT = SimpleDateFormat("yyyyMMdd_HHmmss", NAME_TS_LOCALE)
                 }
             }
         }
-        val ts = synchronized(NAME_TS_FORMAT) { NAME_TS_FORMAT.format(Date()) }
+        val ts = synchronized(tsFormatLock) { NAME_TS_FORMAT.format(Date()) }
         return if (extension.isNullOrBlank()) "${prefix}_${ts}" else "${prefix}_${ts}.$extension"
     }
 
@@ -92,7 +134,7 @@ class FilePathManager(private val context: Context, private val preferExternal: 
         return File(getResultsDir(), fname)
     }
 
-    /** Get a File for an image file. If name is null, a timestamped name will be used ("image_yyyyMMdd_HHmms.jpg"). */
+    /** Get a File for an image file. If name is null, a timestamped name will be used ("image_yyyyMMdd_HHmmss.jpg"). */
     fun getImageFile(name: String? = null, extension: String = "jpg"): File {
         val fname = name ?: timestampedName("image", extension)
         return File(getImagesDir(), fname)
@@ -167,59 +209,5 @@ class FilePathManager(private val context: Context, private val preferExternal: 
         return deleted
     }
 
-    /** Convenience: delete files older than given days from the logs directory. */
-    fun cleanLogsOlderThanDays(days: Int): Int {
-        val ms = days * 24L * 3600L * 1000L
-        return deleteFilesOlderThan(getLogsDir(), ms)
-    }
-
-    /**
-     * Try to create the legacy sdcard folder `/mnt/sdcard/DashcamSystem/logs` and write
-     * a small timestamped text file into it. If creation or write fails (permissions,
-     * storage restrictions), fall back to the app-specific logs directory returned by
-     * [getLogsDir()].
-     *
-     * This method performs the write synchronously; callers should invoke it from a
-     * background thread if they don't want to block startup.
-     *
-     * @return The File written on success (either on /mnt/sdcard path or app logs dir), or null on failure.
-eturn */
-    fun createLegacySdLogsDirAndWriteTimestampedFile(): File? {
-        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
-        val content = "Initialized logging at $timestamp\n"
-
-        // Target legacy path
-        val legacyDir = File("/mnt/sdcard/DashcamSystem/$DIR_LOGS")
-        try {
-            if (!legacyDir.exists()) {
-                legacyDir.mkdirs()
-            }
-            if (legacyDir.exists() && legacyDir.isDirectory && legacyDir.canWrite()) {
-                val fname = "log_${timestamp.replace(":", "-").replace(" ", "_")}.txt"
-                val f = File(legacyDir, fname)
-                try {
-                    f.writeText(content)
-                    return f
-                } catch (e: Exception) {
-                    // fallthrough to fallback below
-                }
-            }
-        } catch (e: Exception) {
-            // ignore and fallback
-        }
-
-        // Fallback to app-specific logs dir
-        try {
-            val appLogFile = getLogFile()
-            try {
-                saveText(appLogFile, content)
-                return appLogFile
-            } catch (e: Exception) {
-                return null
-            }
-        } catch (e: Exception) {
-            return null
-        }
-    }
 
 }

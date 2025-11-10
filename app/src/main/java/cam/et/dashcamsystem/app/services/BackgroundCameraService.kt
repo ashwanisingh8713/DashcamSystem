@@ -25,6 +25,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import cam.et.dashcamsystem.R
+import cam.et.dashcamsystem.device.FilePathManager
 import cam.et.dashcamsystem.nativelib.NativeLib
 import kotlinx.coroutines.*
 import kotlinx.coroutines.currentCoroutineContext
@@ -218,9 +219,9 @@ class BackgroundCameraService : Service(), LocationListener {
             val saved = NativeLib.saveBytesToFile(file.absolutePath, bytes)
             val lat = lastLocation?.latitude ?: 0.0
             val lon = lastLocation?.longitude ?: 0.0
-            val logDir = File(getExternalFilesDir(null), "logs")
+            val logDir = FilePathManager.getLogsDir()
             if (!logDir.exists()) logDir.mkdirs()
-            val logFile = File(logDir, "events.log")
+            val logFile = File(logDir, "events.txt")
             val line = "${filename},${System.currentTimeMillis()},${lat},${lon}\n"
             NativeLib.appendLog(logFile.absolutePath, line)
 

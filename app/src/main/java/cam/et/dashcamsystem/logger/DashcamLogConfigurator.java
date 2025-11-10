@@ -1,4 +1,4 @@
-package cam.et.dashcamlog;
+package cam.et.dashcamsystem.logger;
 
 import android.content.Context;
 import android.content.res.AssetManager;

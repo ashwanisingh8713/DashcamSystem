@@ -12,6 +12,7 @@ data class SystemUsage(
     val usedMemMB: Long,
     val totalMemMB: Long,
     val availMemMB: Long,
+    val storageAvailBytes: Long,
     val timestamp: Long
 )
 
@@ -21,13 +22,18 @@ data class SystemUsage(
  */
 class SystemUsageMonitor(private val context: Context) {
     private var job: Job? = null
+    private var storageJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     // last snapshot values for CPU calculation
     private var lastTotal: Long = 0L
     private var lastIdle: Long = 0L
 
-    fun start(intervalMs: Long = 1000L, onUpdate: (SystemUsage) -> Unit) {
+    // latest known storage available bytes (updated by storageJob)
+    @Volatile
+    private var storageAvailBytes: Long = 0L
+
+    fun start(intervalMs: Long = 1000L, storagePollMs: Long = 60_000L, onUpdate: (SystemUsage) -> Unit) {
         stop()
 
         // Initialize last samples to reduce an incorrect first spike
@@ -36,11 +42,25 @@ class SystemUsageMonitor(private val context: Context) {
             lastIdle = idle
         }
 
+        // Start storage poller if requested (> 0)
+        if (storagePollMs > 0) {
+            storageJob = scope.launch {
+                while (isActive) {
+                    storageAvailBytes = try {
+                        FilePathManager.getAvailableSpaceBytes()
+                    } catch (_: Exception) {
+                        0L
+                    }
+                    delay(storagePollMs)
+                }
+            }
+        }
+
         job = scope.launch {
             while (isActive) {
                 val cpu = readCpuUsagePercent()
                 val (used, total, avail) = readMemory()
-                val usage = SystemUsage(cpu, used, total, avail, System.currentTimeMillis())
+                val usage = SystemUsage(cpu, used, total, avail, storageAvailBytes, System.currentTimeMillis())
                 withContext(Dispatchers.Main) { onUpdate(usage) }
                 delay(intervalMs)
             }
@@ -50,6 +70,8 @@ class SystemUsageMonitor(private val context: Context) {
     fun stop() {
         job?.cancel()
         job = null
+        storageJob?.cancel()
+        storageJob = null
     }
 
     private fun readMemory(): Triple<Long, Long, Long> {

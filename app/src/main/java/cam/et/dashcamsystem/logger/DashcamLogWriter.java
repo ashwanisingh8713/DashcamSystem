@@ -1,6 +1,5 @@
-package cam.et.dashcamlog;
+package cam.et.dashcamsystem.logger;
 
-import android.os.Environment;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -12,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import cam.et.dashcamsystem.device.FilePathManager;
+
 /**
  * A hook to be used with NemoLog
  * <p>
@@ -19,9 +20,7 @@ import java.util.Locale;
  */
 public class DashcamLogWriter {
 
-    // Candidate directories to try (in order). These are legacy external locations.
-    private static final String[] PATH_DIRS;
-    // Filename now includes a timestamp generated once per class load (i.e. once per app execution).
+    // Filename includes a timestamp generated once per class load (i.e. once per app execution).
     private static final String FILENAME;
 
     private static final Object LOCK = new Object();
@@ -30,28 +29,6 @@ public class DashcamLogWriter {
         // Generate a filename-safe timestamp for this execution (no spaces/colons).
         String ts = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         FILENAME = "dashcamlog_" + ts + ".txt";
-
-        String ext = null;
-        try {
-            File external = Environment.getExternalStorageDirectory();
-            if (external != null) {
-                ext = external.getAbsolutePath();
-            }
-        } catch (Exception ignored) {
-        }
-        if (ext == null) {
-            PATH_DIRS = new String[] {
-                    "/mnt/sdcard/DashcamSystem/logs",
-                    "/sdcard/DashcamSystem/logs",
-                    "/storage/emulated/0/DashcamSystem/logs"
-            };
-        } else {
-            PATH_DIRS = new String[] {
-                    ext + "/DashcamSystem/logs",
-                    "/mnt/sdcard/DashcamSystem/logs",
-                    "/sdcard/DashcamSystem/logs"
-            };
-        }
     }
 
     private static String timeStamp() {
@@ -88,27 +65,28 @@ public class DashcamLogWriter {
             line += sw.toString();
         }
 
-        // Try each candidate directory and write the log file into the first writable one.
-        for (String dirPath : PATH_DIRS) {
-            try {
-                synchronized (LOCK) {
-                    File dir = new File(dirPath);
-                    if (!dir.exists()) {
-                        boolean created = dir.mkdirs();
-                        // created may be false if directory couldn't be created; we'll try writing anyway and catch the exception
-                    }
-                    File out = new File(dir, FILENAME);
-                    try (FileOutputStream fos = new FileOutputStream(out, true)) {
-                        fos.write(line.getBytes(StandardCharsets.UTF_8));
-                        fos.flush();
-                        return; // success
-                    } catch (Exception ignored) {
-                        // try next directory
+        // Use the application-managed logs directory provided by FilePathManager.
+        try {
+            File dir = FilePathManager.INSTANCE.getLogsDir();
+            // FilePathManager guarantees a directory; if it somehow returns null, bail out.
+            if (dir == null) return;
+            synchronized (LOCK) {
+                if (!dir.exists()) {
+                    // Try to create directory; if creation fails, give up silently.
+                    if (!dir.mkdirs() && !dir.exists()) {
+                        return;
                     }
                 }
-            } catch (Exception ignored) {
-                // try next directory
+                File out = new File(dir, FILENAME);
+                try (FileOutputStream fos = new FileOutputStream(out, true)) {
+                    fos.write(line.getBytes(StandardCharsets.UTF_8));
+                    fos.flush();
+                } catch (Exception ignored) {
+                    // unable to write; give up
+                }
             }
+        } catch (Throwable ignored) {
+            // FilePathManager not available or failed; do not attempt legacy candidate paths.
         }
 
     }

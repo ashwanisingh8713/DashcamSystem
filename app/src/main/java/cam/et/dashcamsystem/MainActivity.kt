@@ -30,15 +30,40 @@ import cam.et.dashcamsystem.permissions.PermissionManager
 import android.widget.Toast
 import cam.et.dashcamsystem.app.presentation.components.SensorControlsCard
 import java.util.Locale
+import android.app.KeyguardManager
+import android.os.Build
+import android.view.WindowManager
+import cam.et.dashcamsystem.app.DashcamApplication.Companion.getInstance
 
 class MainActivity : ComponentActivity() {
     private lateinit var permissionManager: PermissionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Toast.makeText(getInstance(), "Bring to foreground", Toast.LENGTH_SHORT).show()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         permissionManager = PermissionManager(this)
+
+        // Keep existing behavior but ensure setContent is called so activity UI is visible even if permissions flow
+        setContent {
+            DashcamSystemTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
+                        Greeting(name = "Assignment")
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // System usage card (existing)
+                        SystemUsage()
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Sensor controls & status UI
+                        SensorControlsCard()
+                    }
+                }
+            }
+        }
 
         // If all permissions are not granted, invoke callback behavior directly.
         if (!permissionManager.allPermissionsGranted()) {
@@ -53,47 +78,9 @@ class MainActivity : ComponentActivity() {
                                 Toast.LENGTH_LONG
                             ).show()
                         }
-                    } else {
-                        setContent {
-                            DashcamSystemTheme {
-                                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                                    Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
-                                        Greeting(name = "Assignment")
-                                        Spacer(modifier = Modifier.height(12.dp))
-
-                                        // System usage card (existing)
-                                        SystemUsage()
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        // Sensor controls & status UI
-                                        SensorControlsCard()
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             })
-        } else {
-            setContent {
-                DashcamSystemTheme {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
-                            Greeting(name = "Assignment")
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            // System usage card (existing)
-                            SystemUsage()
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Sensor controls & status UI
-                            SensorControlsCard()
-                        }
-                    }
-                }
-            }
         }
     }
 }

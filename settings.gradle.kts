@@ -21,5 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "DashcamSystem"
 include(":app")
-include(":dashcamLog")
 include(":dashcamCore")
