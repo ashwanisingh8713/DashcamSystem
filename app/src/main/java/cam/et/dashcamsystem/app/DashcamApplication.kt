@@ -3,12 +3,12 @@ package cam.et.dashcamsystem.app
 import android.app.Application
 import android.content.Intent
 import android.os.Build
-import cam.et.dashcamsystem.MainActivity
+import cam.et.dashcamsystem.app.activities.MainActivity
 import cam.et.dashcamsystem.app.services.BackgroundCameraService
 import cam.et.dashcamsystem.app.services.ImmortalService
 import cam.et.dashcamsystem.logger.DashcamLogConfigurator
 import cam.et.dashcamsystem.logger.DashcamLog
-import cam.et.dashcamsystem.device.FilePathManager
+import cam.et.dashcamsystem.util.FilePathManager
 
 class DashcamApplication : Application() {
 

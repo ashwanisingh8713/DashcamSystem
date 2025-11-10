@@ -1,4 +1,4 @@
-package cam.et.dashcamsystem.device
+package cam.et.dashcamsystem.util
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -27,7 +27,8 @@ object FilePathManager {
     @Volatile
     private var NAME_TS_LOCALE: Locale = Locale.getDefault()
     @Volatile
-    private var NAME_TS_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", NAME_TS_LOCALE)
+    private var NAME_TS_FORMAT: SimpleDateFormat =
+        SimpleDateFormat("yyyyMMdd_HHmmss", NAME_TS_LOCALE)
     private val tsFormatLock = Any()
 
     // Application context (set once)

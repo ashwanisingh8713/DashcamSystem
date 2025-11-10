@@ -25,7 +25,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import cam.et.dashcamsystem.R
-import cam.et.dashcamsystem.device.FilePathManager
+import cam.et.dashcamsystem.util.FilePathManager
 import cam.et.dashcamsystem.nativelib.NativeLib
 import kotlinx.coroutines.*
 import kotlinx.coroutines.currentCoroutineContext

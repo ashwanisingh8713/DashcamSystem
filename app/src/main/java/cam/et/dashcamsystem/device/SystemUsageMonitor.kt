@@ -2,6 +2,7 @@ package cam.et.dashcamsystem.device
 
 import android.app.ActivityManager
 import android.content.Context
+import cam.et.dashcamsystem.util.FilePathManager
 import kotlinx.coroutines.*
 import java.io.RandomAccessFile
 import kotlin.math.roundToInt

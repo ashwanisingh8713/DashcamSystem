@@ -1,4 +1,4 @@
-package cam.et.dashcamsystem.device
+package cam.et.dashcamsystem.util
 
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -28,4 +28,3 @@ object TimestampFormatter {
         return synchronized(sdf) { sdf.format(Date(timeMs)) }
     }
 }
-

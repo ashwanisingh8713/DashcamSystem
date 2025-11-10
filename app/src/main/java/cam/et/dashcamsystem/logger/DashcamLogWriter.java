@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import cam.et.dashcamsystem.device.FilePathManager;
+import cam.et.dashcamsystem.util.FilePathManager;
 
 /**
  * A hook to be used with NemoLog

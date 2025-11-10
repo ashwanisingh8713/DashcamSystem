@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import cam.et.dashcamsystem.app.activities.MainActivity
 
 class ImmortalService : Service() {
 
@@ -141,7 +142,7 @@ class ImmortalService : Service() {
         if (bringToFront) {
             try {
                 Log.i("ImmortalService", "Attempting to attach full-screen intent for boot launch")
-                val activityIntent = Intent(this, cam.et.dashcamsystem.MainActivity::class.java).apply {
+                val activityIntent = Intent(this, MainActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
                 val fsPending = PendingIntent.getActivity(this, 0, activityIntent, flags)

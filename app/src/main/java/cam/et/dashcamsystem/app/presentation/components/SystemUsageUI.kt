@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cam.et.dashcamsystem.device.SystemUsageMonitor
 import cam.et.dashcamsystem.logger.DashcamLog
+import cam.et.dashcamsystem.util.TimestampFormatter
 
 @Composable
 fun SystemUsageCard(modifier: Modifier = Modifier, storagePollMs: Long) {
@@ -45,7 +46,7 @@ fun SystemUsageCard(modifier: Modifier = Modifier, storagePollMs: Long) {
             Text(text = "CPU: ${systemUsage.cpuPercent}%", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Memory: ${systemUsage.usedMemMB}MB / ${systemUsage.totalMemMB}MB (avail ${systemUsage.availMemMB}MB)", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Storage available: ${formatBytes(systemUsage.storageAvailBytes)}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Updated: ${cam.et.dashcamsystem.device.TimestampFormatter.format(systemUsage.timestamp)}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Updated: ${TimestampFormatter.format(systemUsage.timestamp)}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -70,7 +71,7 @@ fun SystemUsageCardPreview() {
             Text(text = "CPU: ${sample.cpuPercent}%", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Memory: ${sample.usedMemMB}MB / ${sample.totalMemMB}MB (avail ${sample.availMemMB}MB)", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Storage available: ${formatBytes(sample.storageAvailBytes)}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Updated: ${cam.et.dashcamsystem.device.TimestampFormatter.format(sample.timestamp)}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Updated: ${TimestampFormatter.format(sample.timestamp)}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }
