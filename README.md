@@ -95,11 +95,9 @@ Table layout (3 columns):
 |---|---|---|
 | <a href="screenshots/img_logs_camera.png"><img src="screenshots/img_logs_camera.png" width="120" alt="Camera Logs"/></a> | <a href="screenshots/img_logs_list.png"><img src="screenshots/img_logs_list.png" width="120" alt="Logs List"/></a> | <a href="screenshots/img_system_log.png"><img src="screenshots/img_system_log.png" width="120" alt="System Log"/></a> |
 
-Project file structure
-----------------------
-A small diagram of the repository layout (click to view full-size):
-
-[<img src="screenshots/file_structure.png" width="480" alt="Project file structure"/>](screenshots/file_structure.png)
+| Project File Structure | Project File Structure (app) | Project File Structure (core) |
+|---|---|---|
+| <a href="screenshots/file_structure.png"><img src="screenshots/file_structure.png" width="120" alt="Project file structure"/></a> | <a href="screenshots/fiie_structure_app.png"><img src="screenshots/fiie_structure_app.png" width="120" alt="Project file structure app"/></a> | <a href="screenshots/file_structure_core.png"><img src="screenshots/file_structure_core.png" width="120" alt="Project file structure core"/></a> |
 
 Next steps / Improvements
 ------------------------
