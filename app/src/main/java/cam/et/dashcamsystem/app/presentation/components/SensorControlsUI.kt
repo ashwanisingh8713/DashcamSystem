@@ -38,8 +38,6 @@ fun SensorControlsCard(modifier: Modifier = Modifier) {
     var locationProvider by remember { mutableStateOf<String?>(null) }
     var locationTime by remember { mutableStateOf<String?>(null) }
     var locationAccuracy by remember { mutableStateOf<String?>(null) }
-    // Fallback toggle state (false = GPS-only, true = allow NETWORK fallback)
-    var fallbackEnabled by remember { mutableStateOf(false) }
 
     var accelText by remember { mutableStateOf("No accel data") }
     var gyroText by remember { mutableStateOf("No gyro data") }
@@ -55,14 +53,6 @@ fun SensorControlsCard(modifier: Modifier = Modifier) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(8.dp)) {
             Spacer(modifier = Modifier.height(8.dp))
-            // Row with toggle for fallback behavior
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(text = "Allow NETWORK fallback:")
-                Switch(checked = fallbackEnabled, onCheckedChange = { checked ->
-                    fallbackEnabled = checked
-                    monitor.setLocationFallbackEnabled(checked)
-                }, colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary))
-            }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     // Register listeners
@@ -143,7 +133,6 @@ fun SensorControlsCard(modifier: Modifier = Modifier) {
             val providerText = locationProvider ?: "N/A"
             val providerColor = if (providerText == "disabled") Color.Red else MaterialTheme.colorScheme.onSurface
             Text(text = "Provider: $providerText", style = MaterialTheme.typography.bodyMedium, color = providerColor)
-             Text(text = "Timestamp: ${locationTime ?: "N/A"}", style = MaterialTheme.typography.bodyMedium)
 
             Text(text = "Accel: $accelText", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Gyro: $gyroText", style = MaterialTheme.typography.bodyMedium)

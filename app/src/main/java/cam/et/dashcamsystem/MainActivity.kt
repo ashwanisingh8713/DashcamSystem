@@ -39,10 +39,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var permissionManager: PermissionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Toast.makeText(getInstance(), "Bring to foreground", Toast.LENGTH_SHORT).show()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         permissionManager = PermissionManager(this)
 
         // Keep existing behavior but ensure setContent is called so activity UI is visible even if permissions flow
