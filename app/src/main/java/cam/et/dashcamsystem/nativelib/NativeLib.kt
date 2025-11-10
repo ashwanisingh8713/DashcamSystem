@@ -3,7 +3,7 @@ package cam.et.dashcamsystem.nativelib
 object NativeLib {
     init {
         // library already loaded in MainActivity but safe to load again
-        System.loadLibrary("bgcamapp")
+        System.loadLibrary("dashcamsystem")
     }
 
     // pixels in ARGB_8888 order
