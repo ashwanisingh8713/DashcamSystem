@@ -89,11 +89,11 @@ Table layout (3 columns):
 
 | Main Screen 1 | Main Screen 2 | Low Light Detection |
 |---|---|---|
-| <a href="screenshots/img_main_1.png"><img src="screenshots/img_main_1.png" width="240" alt="Main Screen 1"/></a> | <a href="screenshots/img_main_2.png"><img src="screenshots/img_main_2.png" width="240" alt="Main Screen 2"/></a> | <a href="screenshots/img_LowLight.png"><img src="screenshots/img_LowLight.png" width="240" alt="Low Light Detection"/></a> |
+| <a href="screenshots/img_main_1.png"><img src="screenshots/img_main_1.png" width="120" alt="Main Screen 1"/></a> | <a href="screenshots/img_main_2.png"><img src="screenshots/img_main_2.png" width="120" alt="Main Screen 2"/></a> | <a href="screenshots/img_LowLight.png"><img src="screenshots/img_LowLight.png" width="120" alt="Low Light Detection"/></a> |
 
 | Camera Logs (per-capture) | Logs List | System Log / Diagnostics |
 |---|---|---|
-| <a href="screenshots/img_logs_camera.png"><img src="screenshots/img_logs_camera.png" width="240" alt="Camera Logs"/></a> | <a href="screenshots/img_logs_list.png"><img src="screenshots/img_logs_list.png" width="240" alt="Logs List"/></a> | <a href="screenshots/img_system_log.png"><img src="screenshots/img_system_log.png" width="240" alt="System Log"/></a> |
+| <a href="screenshots/img_logs_camera.png"><img src="screenshots/img_logs_camera.png" width="120" alt="Camera Logs"/></a> | <a href="screenshots/img_logs_list.png"><img src="screenshots/img_logs_list.png" width="120" alt="Logs List"/></a> | <a href="screenshots/img_system_log.png"><img src="screenshots/img_system_log.png" width="120" alt="System Log"/></a> |
 
 Next steps / Improvements
 ------------------------
