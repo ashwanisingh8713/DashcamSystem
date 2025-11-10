@@ -8,26 +8,33 @@ import android.content.Context
  */
 class SystemSensorMonitor(context: Context) {
 
-    private val locationMonitor = cam.et.dashcamsystem.device.LocationMonitor(context)
-    private val motionMonitor = cam.et.dashcamsystem.device.MotionSensorMonitor(context)
-    private val cameraMonitor = cam.et.dashcamsystem.device.CameraMonitor(context)
+    private val locationMonitor = LocationMonitor(context)
+    private val motionMonitor = MotionSensorMonitor(context)
+    private val cameraMonitor = CameraMonitor(context)
 
     // Location
-    fun setLocationListener(listener: cam.et.dashcamsystem.device.LocationMonitor.Listener?) {
+    fun setLocationListener(listener: LocationMonitor.Listener?) {
         locationMonitor.locationListener = listener
     }
 
+    /**
+     * Control whether location monitor may fall back to NETWORK when GPS is unavailable.
+     */
+    fun setLocationFallbackEnabled(enabled: Boolean) {
+        locationMonitor.setUseFallback(enabled)
+    }
+
     // Motion
-    fun setAccelerometerListener(listener: cam.et.dashcamsystem.device.MotionSensorMonitor.AccelerometerListener?) {
+    fun setAccelerometerListener(listener: MotionSensorMonitor.AccelerometerListener?) {
         motionMonitor.accelerometerListener = listener
     }
 
-    fun setGyroscopeListener(listener: cam.et.dashcamsystem.device.MotionSensorMonitor.GyroscopeListener?) {
+    fun setGyroscopeListener(listener: MotionSensorMonitor.GyroscopeListener?) {
         motionMonitor.gyroscopeListener = listener
     }
 
     // Camera
-    fun setCameraFrameListener(listener: cam.et.dashcamsystem.device.CameraMonitor.FrameListener?) {
+    fun setCameraFrameListener(listener: CameraMonitor.FrameListener?) {
         cameraMonitor.frameListener = listener
     }
 
