@@ -83,19 +83,17 @@ Files & storage
 
 Screenshots
 -----------
-Below are screenshots from the app (stored in the `screenshots/` directory of the project):
+Below are compact thumbnails of the app screens (files are in the `screenshots/` folder). Click an image to view the full-size file in the repository.
 
-![Main Screen 1](screenshots/img_main_1.png)
+Table layout (3 columns):
 
-![Main Screen 2](screenshots/img_main_2.png)
+| Main Screen 1 | Main Screen 2 | Low Light Detection |
+|---|---|---|
+| <a href="screenshots/img_main_1.png"><img src="screenshots/img_main_1.png" width="240" alt="Main Screen 1"/></a> | <a href="screenshots/img_main_2.png"><img src="screenshots/img_main_2.png" width="240" alt="Main Screen 2"/></a> | <a href="screenshots/img_LowLight.png"><img src="screenshots/img_LowLight.png" width="240" alt="Low Light Detection"/></a> |
 
-![Low Light Detection](screenshots/img_LowLight.png)
-
-![Camera Logs (per-capture)](screenshots/img_logs_camera.png)
-
-![Logs List](screenshots/img_logs_list.png)
-
-![System Log / Diagnostics](screenshots/img_system_log.png)
+| Camera Logs (per-capture) | Logs List | System Log / Diagnostics |
+|---|---|---|
+| <a href="screenshots/img_logs_camera.png"><img src="screenshots/img_logs_camera.png" width="240" alt="Camera Logs"/></a> | <a href="screenshots/img_logs_list.png"><img src="screenshots/img_logs_list.png" width="240" alt="Logs List"/></a> | <a href="screenshots/img_system_log.png"><img src="screenshots/img_system_log.png" width="240" alt="System Log"/></a> |
 
 Next steps / Improvements
 ------------------------
