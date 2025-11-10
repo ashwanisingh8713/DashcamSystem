@@ -95,6 +95,12 @@ Table layout (3 columns):
 |---|---|---|
 | <a href="screenshots/img_logs_camera.png"><img src="screenshots/img_logs_camera.png" width="120" alt="Camera Logs"/></a> | <a href="screenshots/img_logs_list.png"><img src="screenshots/img_logs_list.png" width="120" alt="Logs List"/></a> | <a href="screenshots/img_system_log.png"><img src="screenshots/img_system_log.png" width="120" alt="System Log"/></a> |
 
+Project file structure
+----------------------
+A small diagram of the repository layout (click to view full-size):
+
+[<img src="screenshots/file_structure.png" width="480" alt="Project file structure"/>](screenshots/file_structure.png)
+
 Next steps / Improvements
 ------------------------
 - Add runtime permission UI flows (request CAMERA, LOCATION, and notifications) before starting the service.
