@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.ktor.json)
     implementation(libs.ktor.client.logging)
     implementation(project(":dashcamCore"))
+    implementation(project(":dashcamLog"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

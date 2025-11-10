@@ -1,4 +1,4 @@
-package cam.et.tee;
+package cam.et.dashcamlog;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -31,9 +31,9 @@ import ch.qos.logback.core.OutputStreamAppender;
 /**
  * Utility methods for configuring the logging.
  */
-public final class NemoLogConfigurator {
+public final class DashcamLogConfigurator {
 
-    private static final NemoLog LOG = NemoLog.get("NemoLog");
+    private static final DashcamLog LOG = DashcamLog.get("NemoLog");
 
     /** Provide direct access to the logger context. */
     public static LoggerContext getLoggerContext() {
@@ -44,7 +44,7 @@ public final class NemoLogConfigurator {
      * Save the current process PID so it's available for logging.
      * <p>
      * This method is also automatically called by the
-     * {@link NemoLogConfigurator#checkCustomConfig(Context)} method.
+     * {@link DashcamLogConfigurator#checkCustomConfig(Context)} method.
      * </p>
      */
     public static void savePid() {
@@ -55,7 +55,6 @@ public final class NemoLogConfigurator {
      * Stops the logging, flushes buffers and stops all background threads.
      */
     public static void stopLogging() {
-        LOG.ri("stopLogging()");
         getLoggerContext().stop();
     }
 
@@ -64,7 +63,7 @@ public final class NemoLogConfigurator {
      * set the default logcat configuration so there will be at least
      * some logging output.
      */
-    static void checkDefaultConfig() {
+    public static void checkDefaultConfig() {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger root = context.getLogger(Logger.ROOT_LOGGER_NAME);
         Iterator<Appender<ILoggingEvent>> it = root.iteratorForAppenders();
@@ -77,7 +76,7 @@ public final class NemoLogConfigurator {
             // Set the default log level
             root.setLevel(BuildConfig.DEBUG ? Level.TRACE : Level.INFO);
 
-            LOG.re("assets/logback.xml not loaded, using default");
+            LOG.d("assets/logback.xml not loaded, using default");
         }
     }
 
@@ -91,7 +90,6 @@ public final class NemoLogConfigurator {
         if (file == null || !file.exists()) {
             throw new IllegalArgumentException("No such file=" + file);
         }
-        LOG.ri("reconfigure() file={}", file);
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         try {
             JoranConfigurator configurator = new JoranConfigurator();
@@ -99,7 +97,6 @@ public final class NemoLogConfigurator {
             context.reset();
             configurator.doConfigure(file);
         } catch (Exception e) {
-            LOG.re("reconfigure() failed, file=" + file, e);
             return false;
         }
         return true;
@@ -116,7 +113,6 @@ public final class NemoLogConfigurator {
 
         File customConfig = new File(context.getFilesDir(), "logback.xml");
         if (customConfig.exists()) {
-            LOG.ri("checkCustomConfig() found file={}", customConfig);
             reconfigure(customConfig);
         }
 
@@ -148,10 +144,8 @@ public final class NemoLogConfigurator {
         try {
             stream = assets.open("logback.xml");
         } catch (IOException e) {
-            LOG.rw("configureFromAssets() no asset/logback.xml");
             return;
         }
-        LOG.ri("configureFromAssets()");
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         try {
@@ -160,7 +154,6 @@ public final class NemoLogConfigurator {
             loggerContext.reset();
             configurator.doConfigure(stream);
         } catch (Exception e) {
-            LOG.re("configureFromAssets() failed", e);
         } finally {
             try {
                 stream.close();
@@ -173,7 +166,7 @@ public final class NemoLogConfigurator {
      * Create and add custom appender with DEBUG level threshold.
      *
      * @param output The stream where the formatted log output will be written.
-     * @return The created appender, which can be later passed to {@link NemoLogConfigurator#removeCustomAppender(AsyncAppender)}.
+     * @return The created appender, which can be later passed to {@link DashcamLogConfigurator#removeCustomAppender(AsyncAppender)}.
      */
     public static AsyncAppender addCustomAppender(OutputStream output) {
         return addCustomAppender(output, Level.DEBUG);
@@ -184,7 +177,7 @@ public final class NemoLogConfigurator {
      *
      * @param output The stream where the formatted log output will be written.
      * @param level  The log level threshold.
-     * @return The created appender, which can be later passed to {@link NemoLogConfigurator#removeCustomAppender(AsyncAppender)}.
+     * @return The created appender, which can be later passed to {@link DashcamLogConfigurator#removeCustomAppender(AsyncAppender)}.
      */
     public static AsyncAppender addCustomAppender(OutputStream output, Level level) {
         return addCustomAppender(output, level, "%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{pid}] [%thread] %-5level %logger{1} %msg%n");
@@ -196,7 +189,7 @@ public final class NemoLogConfigurator {
      * @param output  The stream where the formatted log output will be written.
      * @param level   The log level threshold.
      * @param pattern The pattern for formatting the log output.
-     * @return The created appender, which can be later passed to {@link NemoLogConfigurator#removeCustomAppender(AsyncAppender)}.
+     * @return The created appender, which can be later passed to {@link DashcamLogConfigurator#removeCustomAppender(AsyncAppender)}.
      */
     public static AsyncAppender addCustomAppender(final OutputStream output, final Level level, final String pattern) {
         if (output == null || level == null || pattern == null) {

@@ -35,8 +35,14 @@ class MainActivity : ComponentActivity() {
                     if (!allGranted) {
                         // Simple feedback; the PermissionManager handles the requests.
                         runOnUiThread {
-                            Toast.makeText(this@MainActivity, "Permissions denied: ${denied.joinToString()}", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Permissions denied: ${denied.joinToString()}",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
+                    } else {
+                        // TODO, Nothing
                     }
                 }
             })

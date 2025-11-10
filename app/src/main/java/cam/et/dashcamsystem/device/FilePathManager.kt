@@ -173,4 +173,53 @@ class FilePathManager(private val context: Context, private val preferExternal: 
         return deleteFilesOlderThan(getLogsDir(), ms)
     }
 
+    /**
+     * Try to create the legacy sdcard folder `/mnt/sdcard/DashcamSystem/logs` and write
+     * a small timestamped text file into it. If creation or write fails (permissions,
+     * storage restrictions), fall back to the app-specific logs directory returned by
+     * [getLogsDir()].
+     *
+     * This method performs the write synchronously; callers should invoke it from a
+     * background thread if they don't want to block startup.
+     *
+     * @return The File written on success (either on /mnt/sdcard path or app logs dir), or null on failure.
+eturn */
+    fun createLegacySdLogsDirAndWriteTimestampedFile(): File? {
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
+        val content = "Initialized logging at $timestamp\n"
+
+        // Target legacy path
+        val legacyDir = File("/mnt/sdcard/DashcamSystem/$DIR_LOGS")
+        try {
+            if (!legacyDir.exists()) {
+                legacyDir.mkdirs()
+            }
+            if (legacyDir.exists() && legacyDir.isDirectory && legacyDir.canWrite()) {
+                val fname = "log_${timestamp.replace(":", "-").replace(" ", "_")}.txt"
+                val f = File(legacyDir, fname)
+                try {
+                    f.writeText(content)
+                    return f
+                } catch (e: Exception) {
+                    // fallthrough to fallback below
+                }
+            }
+        } catch (e: Exception) {
+            // ignore and fallback
+        }
+
+        // Fallback to app-specific logs dir
+        try {
+            val appLogFile = getLogFile()
+            try {
+                saveText(appLogFile, content)
+                return appLogFile
+            } catch (e: Exception) {
+                return null
+            }
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
 }

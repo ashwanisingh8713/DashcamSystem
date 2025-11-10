@@ -2,7 +2,8 @@
 <!-- https://github.com/tony19/logback-android/wiki -->
 <configuration>
 
-    <!-- LOG_DIR is set by the application at runtime to an app-writable path. -->
+    <!-- LOG_DIR is provided by the application at runtime to ensure we write
+         into an app-writable location (externalFilesDir or filesDir). -->
     <property name="LOG_FILE" value="app.log"/>
 
     <!-- Appender which writes the logs to file.

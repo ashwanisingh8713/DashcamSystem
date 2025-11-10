@@ -16,9 +16,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cam.et.dashcamsystem.device.SystemUsageMonitor
+import cam.et.dashcamlog.DashcamLog
 
 @Composable
 fun SystemUsageCard(modifier: Modifier = Modifier) {
+    // Logger that will write system usage updates to the NemoLog-backed logging system
+    val LOG = remember { DashcamLog.get("SystemUsageMonitor") }
     // Compose state to hold latest usage
     var systemUsage by remember { mutableStateOf(cam.et.dashcamsystem.device.SystemUsage(0f, 0, 0, 0, 0)) }
     val ctx = LocalContext.current
@@ -28,6 +31,8 @@ fun SystemUsageCard(modifier: Modifier = Modifier) {
         val monitor = SystemUsageMonitor(ctx)
         monitor.start(1000L) { newUsage ->
             systemUsage = newUsage
+            // Log each update to the NemoLog file logger (ri -> info level, written in release too)
+            LOG.d("CPU: ${newUsage.cpuPercent}%, Memory: ${newUsage.usedMemMB}MB/${newUsage.totalMemMB}MB (avail ${newUsage.availMemMB}MB), ts: ${newUsage.timestamp}")
         }
         onDispose {
             monitor.stop()
